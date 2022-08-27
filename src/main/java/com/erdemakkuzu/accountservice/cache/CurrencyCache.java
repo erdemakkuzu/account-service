@@ -13,15 +13,19 @@ import java.util.List;
 @Service
 public class CurrencyCache {
 
+
+    private final CurrencyRepository currencyRepository;
+
+    Cache<String, Currency> currencyMap;
+
     @Autowired
-    CurrencyRepository currencyRepository;
-
-    Cache<String, Currency> currencyCache;
-
+    CurrencyCache(CurrencyRepository currencyRepository){
+        this.currencyRepository = currencyRepository;
+    }
 
     @PostConstruct
     public void init() {
-        currencyCache = new Cache2kBuilder<String, Currency>() {}
+        currencyMap = new Cache2kBuilder<String, Currency>() {}
                 .name("currencyCache")
                 .eternal(true)
                 .entryCapacity(15)
@@ -30,13 +34,13 @@ public class CurrencyCache {
         List<Currency> currencies = currencyRepository.findAll();
 
         for(Currency currency : currencies){
-            currencyCache.put(currency.getCode(), currency);
+            currencyMap.put(currency.getCode(), currency);
         }
 
     }
 
-    public Cache<String, Currency> getCurrencyCache(){
-        return currencyCache;
+    public Cache<String, Currency> getCurrencyMap(){
+        return currencyMap;
     }
 
 
