@@ -1,0 +1,6 @@
+2022-08-28 17:13:33 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLDataException: Data conversion error converting "'0,094' (CURRENCY: ""PARITY"" DOUBLE)"; SQL statement:
+INSERT INTO "PUBLIC"."CURRENCY"("ID","CODE","PARITY")VALUES(?,?,?) [22018-200]
+2022-08-28 17:13:33 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLDataException: Data conversion error converting "'0,094' (CURRENCY: ""PARITY"" DOUBLE)"; SQL statement:
+INSERT INTO "PUBLIC"."CURRENCY"("ID","CODE","PARITY")VALUES(?,?,?) [22018-200]
