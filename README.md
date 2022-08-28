@@ -29,7 +29,7 @@ mvn clean package
 ```bash
 java -jar target/account-service.jar
 ```
-Or if you prefer to run the application inside a container, then please  follow the steps below after creating the **wallet-service.jar** (3rd step above)
+Or if you prefer to run the application inside a container, then please  follow the steps below after creating the **account-service.jar** (3rd step above)
 
 1. Make sure that your docker engine is up.
 2. Execute the following command under the project folder. It will build a docker image.
