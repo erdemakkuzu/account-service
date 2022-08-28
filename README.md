@@ -131,7 +131,7 @@ Request body example:
 * you must have the specific currency account to perform this operation.
 * you must have enough balance to perform this operation
 
-**6. POST Debit /api/account/{accountId}/exchange-currency**
+**6. POST Exchange Currency /api/account/{accountId}/exchange-currency**
 * You can exchange currency between your currency accounts by providing you main account id.
 
 Request body example:
