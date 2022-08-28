@@ -11,4 +11,8 @@ public interface AccountService {
     PerformTransactionResponse performAddMoney(Long accountId, PerformTransactionRequest performTransactionRequest);
 
     CreateCurrencyAccountResponse createCurrencyAccount(Long accountId, CreateCurrencyAccountRequest createCurrencyAccountRequest);
+
+    PerformTransactionResponse performDebit(Long accountId, PerformTransactionRequest performTransactionRequest);
+
+    GetAccountResponse getAccount(Long accountId);
 }

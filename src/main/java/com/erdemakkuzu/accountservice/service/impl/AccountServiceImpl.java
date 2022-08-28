@@ -1,5 +1,6 @@
 package com.erdemakkuzu.accountservice.service.impl;
 
+import com.erdemakkuzu.accountservice.constant.ExternalUrls;
 import com.erdemakkuzu.accountservice.entity.Account;
 import com.erdemakkuzu.accountservice.entity.Currency;
 import com.erdemakkuzu.accountservice.entity.CurrencyAccount;
@@ -11,7 +12,10 @@ import com.erdemakkuzu.accountservice.service.AccountService;
 import com.erdemakkuzu.accountservice.service.CurrencyService;
 import com.erdemakkuzu.accountservice.utils.MapperUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.Transactional;
 import java.util.Date;
@@ -38,10 +42,12 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public CreateAccountResponse createAccount(CreateAccountRequest createAccountRequest) {
 
-        Currency currency = currencyService.getCurrency(createAccountRequest.getInitialCurrency());
+        String initialCurrency = createAccountRequest.getInitialCurrency();
+
+        Currency currency = currencyService.getCurrency(initialCurrency);
 
         if (currency == null) {
-            throw new RuntimeException();
+            throw new InvalidCurrencyException(initialCurrency);
         }
 
         Account account = new Account();
@@ -62,7 +68,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public CreateCurrencyAccountResponse createCurrencyAccount(Long accountId, CreateCurrencyAccountRequest createCurrencyAccountRequest) {
+    public CreateCurrencyAccountResponse createCurrencyAccount(Long accountId,
+                                                               CreateCurrencyAccountRequest createCurrencyAccountRequest) {
         Optional<Account> account = accountRepository.findById(accountId);
 
         Currency currency =
@@ -78,6 +85,61 @@ public class AccountServiceImpl implements AccountService {
         return MapperUtils.mapToCreateCurrencyAccountResponse(currencyAccount, createCurrencyAccountRequest);
 
 
+    }
+
+    @Override
+    @Transactional
+    public PerformTransactionResponse performDebit(Long accountId, PerformTransactionRequest performTransactionRequest) {
+        Double transactionAmount = validateAndGetTransactionAmont(performTransactionRequest);
+
+        Account account = validateAndGetAccount(accountId);
+
+        validateCurrency(performTransactionRequest);
+
+        CurrencyAccount currencyAccount =
+                validateAndGetCurrencyAccount(account, performTransactionRequest.getCurrencyCode());
+
+        if (currencyAccount.getBalance() < transactionAmount) {
+            throw new NotEnoughBalanceException(transactionAmount);
+        }
+
+        currencyAccount.setBalance(currencyAccount.getBalance() - transactionAmount);
+
+        currencyAccountRepository.saveAndFlush(currencyAccount);
+
+        new Thread(this::simulateExternalCall).start();
+
+        return MapperUtils.mapToPerformTransactionResponse(currencyAccount);
+    }
+
+    @Override
+    public GetAccountResponse getAccount(Long accountId) {
+        Optional<Account> account = accountRepository.findById(accountId);
+
+        if (account.isEmpty()) {
+            throw new AccountNotFoundException(accountId);
+        }
+
+        return MapperUtils.mapToGetAccountResponse(account.get());
+
+    }
+
+    void simulateExternalCall() {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+
+            ResponseEntity<String> response
+                    = restTemplate.getForEntity(ExternalUrls.HTTP_STATUS_URL, String.class);
+
+            if (response.getStatusCode() == HttpStatus.OK) {
+                System.out.println("Successful call");
+            } else {
+                System.out.println("Unsuccessful call");
+            }
+
+        } catch (Exception e) {
+            System.out.println("Rest call failed");
+        }
     }
 
     private Currency validateCreateCurrencyAccountRequestAndGetCurrency(Long accountId,
@@ -106,28 +168,17 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional
     public PerformTransactionResponse performAddMoney(Long accountId, PerformTransactionRequest performTransactionRequest) {
 
-        Double transactionAmount = performTransactionRequest.getAmount();
+        Double transactionAmount = validateAndGetTransactionAmont(performTransactionRequest);
 
-        if (transactionAmount < 1.0) {
-            throw new MinimumTransactionAmountException(transactionAmount);
-        }
+        Account account = validateAndGetAccount(accountId);
 
-        Optional<Account> account = accountRepository.findById(accountId);
-
-        if (account.isEmpty()) {
-            throw new AccountNotFoundException(accountId);
-        }
-
-        Currency currency = currencyService.getCurrency(performTransactionRequest.getCurrencyCode());
-
-        if (currency == null) {
-            throw new InvalidCurrencyException(performTransactionRequest.getCurrencyCode());
-        }
+        validateCurrency(performTransactionRequest);
 
         CurrencyAccount currencyAccount =
-                validateAndGetCurrencyAccount(account.get(), performTransactionRequest.getCurrencyCode());
+                validateAndGetCurrencyAccount(account, performTransactionRequest.getCurrencyCode());
 
         currencyAccount.setBalance(currencyAccount.getBalance() + transactionAmount);
 
@@ -135,6 +186,32 @@ public class AccountServiceImpl implements AccountService {
 
         return MapperUtils.mapToPerformTransactionResponse(currencyAccount);
 
+    }
+
+    private void validateCurrency(PerformTransactionRequest performTransactionRequest) {
+        Currency currency = currencyService.getCurrency(performTransactionRequest.getCurrencyCode());
+
+        if (currency == null) {
+            throw new InvalidCurrencyException(performTransactionRequest.getCurrencyCode());
+        }
+    }
+
+    private Account validateAndGetAccount(Long accountId) {
+        Optional<Account> account = accountRepository.findById(accountId);
+
+        if (account.isEmpty()) {
+            throw new AccountNotFoundException(accountId);
+        }
+        return account.get();
+    }
+
+    private Double validateAndGetTransactionAmont(PerformTransactionRequest performTransactionRequest) {
+        Double transactionAmount = performTransactionRequest.getAmount();
+
+        if (transactionAmount < 1.0) {
+            throw new MinimumTransactionAmountException(transactionAmount);
+        }
+        return transactionAmount;
     }
 
     private CurrencyAccount validateAndGetCurrencyAccount(Account account, String currencyCode) {

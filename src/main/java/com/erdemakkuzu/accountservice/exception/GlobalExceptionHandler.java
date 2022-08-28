@@ -53,4 +53,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(NotEnoughBalanceException.class)
+    public ResponseEntity<?> handleNotEnoughBalanceException(NotEnoughBalanceException notEnoughBalanceException) {
+        ErrorDetails errorDetails = new ErrorDetails();
+        errorDetails.setErrorCode(ErrorMessageKeys.NOT_ENOUGH_BALANCE);
+        errorDetails.setValue(notEnoughBalanceException.getDebitAmount().toString());
+        errorDetails.setField(FieldKeys.AMOUNT);
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
 }

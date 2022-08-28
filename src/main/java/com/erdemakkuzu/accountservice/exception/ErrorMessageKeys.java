@@ -7,4 +7,5 @@ public class ErrorMessageKeys {
     public static final String CURRENCY_ACCOUNT_ALREADY_EXISTS = "currency_account_already_exists";
     public static final String CURRENCY_ACCOUNT_NOT_FOUND = "currency_account_not_found";
     public static final String INVALID_TRANSACTION_AMOUNT = "invalid_transaction_amount";
+    public static final String NOT_ENOUGH_BALANCE = "not_enough_balance";
 }

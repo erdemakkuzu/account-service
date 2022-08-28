@@ -27,13 +27,7 @@ public class MapperUtils {
         CreateCurrencyAccountResponse createCurrencyAccountResponse = new CreateCurrencyAccountResponse();
         createCurrencyAccountResponse.setAccountId(account.getId());
 
-        List<CurrencyBalance> currencyBalanceList = new ArrayList<>();
-
-        for (CurrencyAccount currencyAccountOfAccount : account.getCurrencyAccounts()) {
-            String currencyCode = currencyAccountOfAccount.getCurrency().getCode();
-            Double balance = currencyAccountOfAccount.getBalance();
-            currencyBalanceList.add(new CurrencyBalance(currencyCode, balance));
-        }
+        List<CurrencyBalance> currencyBalanceList = getCurrencyAccountList(account);
 
         currencyBalanceList.add(new CurrencyBalance(createCurrencyAccountRequest.getCurrencyCode(), 0.0));
 
@@ -47,18 +41,38 @@ public class MapperUtils {
         performTransactionResponse.setAccountId(currencyAccount.getAccount().getId());
 
         Account account = currencyAccount.getAccount();
-        List<CurrencyBalance> currencyBalanceList = new ArrayList<>();
-
-        for (CurrencyAccount currencyAccountOfAccount : account.getCurrencyAccounts()) {
-            String currencyCode = currencyAccountOfAccount.getCurrency().getCode();
-            Double balance = currencyAccountOfAccount.getBalance();
-            currencyBalanceList.add(new CurrencyBalance(currencyCode, balance));
-        }
+        List<CurrencyBalance> currencyBalanceList = getCurrencyAccountList(account);
 
         performTransactionResponse.setCurrencyBalanceList(currencyBalanceList);
 
         return performTransactionResponse;
 
 
+    }
+
+    public static GetAccountResponse mapToGetAccountResponse(Account account) {
+        GetAccountResponse getAccountResponse = new GetAccountResponse();
+        getAccountResponse.setAccountId(account.getId());
+        getAccountResponse.setCreatedDate(account.getCreatedDate());
+        getAccountResponse.setOwner(account.getCustomerFullName());
+
+        List<CurrencyBalance> currencyBalanceList = getCurrencyAccountList(account);
+
+        getAccountResponse.setCurrencyBalanceList(currencyBalanceList);
+
+        return getAccountResponse;
+
+    }
+
+    public static List<CurrencyBalance> getCurrencyAccountList(Account account) {
+        List<CurrencyBalance> currencyBalanceList = new ArrayList<>();
+
+        for (CurrencyAccount currencyAccount : account.getCurrencyAccounts()) {
+            String currencyCode = currencyAccount.getCurrency().getCode();
+            Double balance = currencyAccount.getBalance();
+            currencyBalanceList.add(new CurrencyBalance(currencyCode, balance));
+        }
+
+        return currencyBalanceList;
     }
 }

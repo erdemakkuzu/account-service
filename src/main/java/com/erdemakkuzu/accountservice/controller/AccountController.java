@@ -29,8 +29,19 @@ public class AccountController {
     }
 
     @PostMapping(value = "/{accountId}/add-money", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PerformTransactionResponse> performCredit(@PathVariable("accountId") final Long accountId,
-                                                                    @RequestBody PerformTransactionRequest performTransactionRequest) {
-        return new ResponseEntity<>(accountService.performAddMoney(accountId, performTransactionRequest), HttpStatus.CREATED);
+    public ResponseEntity<PerformTransactionResponse> performAddMoney(@PathVariable("accountId") final Long accountId,
+                                                                      @RequestBody PerformTransactionRequest performTransactionRequest) {
+        return new ResponseEntity<>(accountService.performAddMoney(accountId, performTransactionRequest), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/{accountId}/debit", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PerformTransactionResponse> performDebit(@PathVariable("accountId") final Long accountId,
+                                                                   @RequestBody PerformTransactionRequest performTransactionRequest) {
+        return new ResponseEntity<>(accountService.performDebit(accountId, performTransactionRequest), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{accountId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetAccountResponse> getAccount(@PathVariable("accountId") final Long accountId) {
+        return new ResponseEntity<>(accountService.getAccount(accountId), HttpStatus.OK);
     }
 }
