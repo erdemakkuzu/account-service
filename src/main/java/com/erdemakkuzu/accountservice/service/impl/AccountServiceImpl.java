@@ -11,6 +11,7 @@ import com.erdemakkuzu.accountservice.repository.CurrencyAccountRepository;
 import com.erdemakkuzu.accountservice.service.AccountService;
 import com.erdemakkuzu.accountservice.service.CurrencyService;
 import com.erdemakkuzu.accountservice.utils.MapperUtils;
+import com.erdemakkuzu.accountservice.utils.RoundUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,7 +106,7 @@ public class AccountServiceImpl implements AccountService {
             throw new NotEnoughBalanceException(transactionAmount);
         }
 
-        currencyAccount.setBalance(currencyAccount.getBalance() - transactionAmount);
+        currencyAccount.setBalance(RoundUtils.round(currencyAccount.getBalance() - transactionAmount));
 
         currencyAccountRepository.saveAndFlush(currencyAccount);
 
@@ -160,9 +161,9 @@ public class AccountServiceImpl implements AccountService {
 
         fromCurrencyAccount.get().setBalance(fromCurrencyAccount.get().getBalance() - amount);
 
-        Double addedAmount = (fromCurrency.getParity() * amount) / toCurrency.getParity();
+        Double addedAmount = RoundUtils.round((fromCurrency.getParity() * amount) / toCurrency.getParity());
 
-        toCurrencyAccount.get().setBalance(toCurrencyAccount.get().getBalance() + addedAmount);
+        toCurrencyAccount.get().setBalance(RoundUtils.round(toCurrencyAccount.get().getBalance() + addedAmount));
 
         currencyAccountRepository.saveAndFlush(toCurrencyAccount.get());
         currencyAccountRepository.saveAndFlush(fromCurrencyAccount.get());
@@ -226,7 +227,7 @@ public class AccountServiceImpl implements AccountService {
         CurrencyAccount currencyAccount =
                 validateAndGetCurrencyAccount(account, performTransactionRequest.getCurrencyCode());
 
-        currencyAccount.setBalance(currencyAccount.getBalance() + transactionAmount);
+        currencyAccount.setBalance(RoundUtils.round(currencyAccount.getBalance() + transactionAmount));
 
         currencyAccountRepository.saveAndFlush(currencyAccount);
 
