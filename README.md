@@ -92,7 +92,7 @@ Request body example:
 **2. GET Account /api/account/{accountId}**
 * You can display account information with this api.
 
-**3. POST Currency Account /api/account/{accountId}/currency-account*
+**3. POST Currency Account /api/account/{accountId}/currency-account**
 * You can create currency accounts with this API by providing you main account id.
 
 Request body example:
@@ -102,7 +102,7 @@ Request body example:
 }
 ```
 
-**4. POST Add money /api/account/{accountId}/add-money*
+**4. POST Add money /api/account/{accountId}/add-money**
 * You can add money to your account by providing you main account id.
 
 Request body example:
@@ -116,7 +116,7 @@ Request body example:
 * amount must be bigger than 1 
 * you must have the specific currency account to perform this operation.
 
-**5. POST Debit /api/account/{accountId}/debit*
+**5. POST Debit /api/account/{accountId}/debit**
 * You debit money from your account by providing you main account id.
 
 Request body example:
@@ -131,7 +131,7 @@ Request body example:
 * you must have the specific currency account to perform this operation.
 * you must have enough balance to perform this operation
 
-**6. POST Debit /api/account/{accountId}/exchange-currency*
+**6. POST Debit /api/account/{accountId}/exchange-currency**
 * You can exchange currency between your currency accounts by providing you main account id.
 
 Request body example:
