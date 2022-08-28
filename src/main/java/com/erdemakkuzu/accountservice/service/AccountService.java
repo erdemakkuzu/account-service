@@ -15,4 +15,6 @@ public interface AccountService {
     PerformTransactionResponse performDebit(Long accountId, PerformTransactionRequest performTransactionRequest);
 
     GetAccountResponse getAccount(Long accountId);
+
+    PerformCurrencyExchangeResponse performCurrencyExchange(Long accountId, PerformCurrencyExchangeRequest performCurrencyExchangeRequest);
 }

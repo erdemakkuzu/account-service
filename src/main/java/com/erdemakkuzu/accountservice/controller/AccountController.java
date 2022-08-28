@@ -44,4 +44,10 @@ public class AccountController {
     public ResponseEntity<GetAccountResponse> getAccount(@PathVariable("accountId") final Long accountId) {
         return new ResponseEntity<>(accountService.getAccount(accountId), HttpStatus.OK);
     }
+
+    @PostMapping(value = "/{accountId}/exchange-currency", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PerformCurrencyExchangeResponse> performExchangeCurrency(@PathVariable("accountId") final Long accountId,
+                                                                                   @RequestBody PerformCurrencyExchangeRequest performCurrencyExchangeRequest) {
+        return new ResponseEntity<>(accountService.performCurrencyExchange(accountId, performCurrencyExchangeRequest), HttpStatus.OK);
+    }
 }

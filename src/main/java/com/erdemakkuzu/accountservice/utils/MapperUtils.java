@@ -75,4 +75,12 @@ public class MapperUtils {
 
         return currencyBalanceList;
     }
+
+    public static PerformCurrencyExchangeResponse mapToPerformCurrencyExchangeResponse(Double addedAmount,
+                                                                                       CurrencyAccount currencyAccount) {
+
+        return new PerformCurrencyExchangeResponse(addedAmount,
+                currencyAccount.getCurrency().getCode(),
+                currencyAccount.getBalance());
+    }
 }
